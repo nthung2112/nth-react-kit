@@ -1,9 +1,7 @@
 /* eslint-disable max-len */
 
 if (process.env.BROWSER) {
-  throw new Error(
-    'Do not import `config.js` from inside the client-side code.',
-  );
+  throw new Error('Do not import `config.js` from inside the client-side code.');
 }
 
 module.exports = {
@@ -26,9 +24,7 @@ module.exports = {
     // API URL to be used in the client-side code
     clientUrl: process.env.API_CLIENT_URL || '',
     // API URL to be used in the server-side code
-    serverUrl:
-      process.env.API_SERVER_URL ||
-      `http://localhost:${process.env.PORT || 3000}`,
+    serverUrl: process.env.API_SERVER_URL || `http://localhost:${process.env.PORT || 3000}`,
   },
 
   // Database

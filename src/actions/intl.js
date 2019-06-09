@@ -2,11 +2,7 @@
 
 import { IntlProvider } from 'react-intl';
 
-import {
-  SET_LOCALE_START,
-  SET_LOCALE_SUCCESS,
-  SET_LOCALE_ERROR,
-} from '../constants';
+import { SET_LOCALE_START, SET_LOCALE_SUCCESS, SET_LOCALE_ERROR } from '../constants';
 
 function getIntlFromState(state) {
   const intl = (state && state.intl) || {};

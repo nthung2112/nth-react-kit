@@ -13,9 +13,6 @@ module.exports = {
     '@babel/preset-flow',
     '@babel/preset-react',
   ],
-  plugins: [
-    '@babel/plugin-proposal-class-properties',
-    '@babel/plugin-syntax-dynamic-import',
-  ],
+  plugins: ['@babel/plugin-proposal-class-properties', '@babel/plugin-syntax-dynamic-import'],
   ignore: ['node_modules', 'build'],
 };

@@ -11,12 +11,12 @@ import ReactDOM from 'react-dom/server';
 import PrettyError from 'pretty-error';
 import { IntlProvider } from 'react-intl';
 
-import './serverIntlPolyfill';
+import './core/serverIntlPolyfill';
 import App from './components/App';
 import Html from './components/Html';
 import { ErrorPageWithoutStyle } from './routes/error/ErrorPage';
 import errorPageStyle from './routes/error/ErrorPage.css';
-import createFetch from './createFetch';
+import createFetch from './core/createFetch';
 import router from './router';
 // import assets from './asset-manifest.json'; // eslint-disable-line import/no-unresolved
 import chunks from './chunk-manifest.json'; // eslint-disable-line import/no-unresolved
@@ -49,9 +49,9 @@ app.set('trust proxy', config.trustProxy);
 //
 // Register Node.js middleware
 // -----------------------------------------------------------------------------
+app.use(compression());
 app.use(express.static(path.resolve(__dirname, 'public')));
 app.use(cookieParser());
-app.use(compression());
 app.use(
   requestLanguage({
     languages: config.locales,
@@ -187,9 +187,7 @@ app.get('*', async (req, res, next) => {
     }
 
     const data = { ...route };
-    data.children = ReactDOM.renderToString(
-      <App context={context}>{route.component}</App>,
-    );
+    data.children = ReactDOM.renderToString(<App context={context}>{route.component}</App>);
     data.styles = [{ id: 'css', cssText: [...css].join('') }];
 
     const scripts = new Set();

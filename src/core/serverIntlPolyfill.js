@@ -1,6 +1,6 @@
 import areIntlLocalesSupported from 'intl-locales-supported';
 
-import { locales } from './config';
+import { locales } from '../config';
 
 if (global.Intl) {
   // Determine if the built-in `Intl` has the locale data we need.

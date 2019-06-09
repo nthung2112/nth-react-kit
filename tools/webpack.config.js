@@ -15,16 +15,13 @@ const BUILD_DIR = resolvePath('build');
 
 const isDebug = !process.argv.includes('--release');
 const isVerbose = process.argv.includes('--verbose');
-const isAnalyze =
-  process.argv.includes('--analyze') || process.argv.includes('--analyse');
+const isAnalyze = process.argv.includes('--analyze') || process.argv.includes('--analyse');
 
 const reScript = /\.(js|jsx|mjs)$/;
 const reStyle = /\.(css|less|styl|scss|sass|sss)$/;
 const reImage = /\.(bmp|gif|jpg|jpeg|png|svg)$/;
 
-const staticAssetName = isDebug
-  ? '[path][name].[ext]?[hash:8]'
-  : '[hash:8].[ext]';
+const staticAssetName = isDebug ? '[path][name].[ext]?[hash:8]' : '[hash:8].[ext]';
 
 //
 // Common configuration chunk to be used for both
@@ -36,14 +33,17 @@ const config = {
 
   mode: isDebug ? 'development' : 'production',
 
+  performance: {
+    maxEntrypointSize: 512000,
+    maxAssetSize: 512000,
+  },
+
   output: {
     path: resolvePath(BUILD_DIR, 'public/assets'),
     publicPath: '/assets/',
     pathinfo: isVerbose,
     filename: isDebug ? '[name].js' : '[name].[chunkhash:8].js',
-    chunkFilename: isDebug
-      ? '[name].chunk.js'
-      : '[name].[chunkhash:8].chunk.js',
+    chunkFilename: isDebug ? '[name].chunk.js' : '[name].[chunkhash:8].chunk.js',
     // Point sourcemap entries to original disk location (format as URL on Windows)
     devtoolModuleFilenameTemplate: info =>
       path.resolve(info.absoluteResourcePath).replace(/\\/g, '/'),
@@ -111,10 +111,7 @@ const config = {
             [
               'react-intl',
               {
-                messagesDir: path.resolve(
-                  __dirname,
-                  '../build/messages/extracted',
-                ),
+                messagesDir: path.resolve(__dirname, '../build/messages/extracted'),
                 extractSourceLocation: true,
                 enforceDescriptions: false,
               },
@@ -152,9 +149,7 @@ const config = {
               sourceMap: isDebug,
               // CSS Modules https://github.com/css-modules/css-modules
               modules: true,
-              localIdentName: isDebug
-                ? '[name]-[local]-[hash:base64:5]'
-                : '[hash:base64:5]',
+              localIdentName: isDebug ? '[name]-[local]-[hash:base64:5]' : '[hash:base64:5]',
             },
           },
 
@@ -252,9 +247,7 @@ const config = {
         ? []
         : [
             {
-              test: resolvePath(
-                'node_modules/react-deep-force-update/lib/index.js',
-              ),
+              test: resolvePath('node_modules/react-deep-force-update/lib/index.js'),
               loader: 'null-loader',
             },
           ]),
@@ -334,10 +327,7 @@ const clientConfig = {
             acc[c.name] = [
               ...(acc[c.name] || []),
               ...c.chunks.reduce(
-                (files, cc) => [
-                  ...files,
-                  ...cc.files.filter(fileFilter).map(addPath),
-                ],
+                (files, cc) => [...files, ...cc.files.filter(fileFilter).map(addPath)],
                 [],
               ),
             ];

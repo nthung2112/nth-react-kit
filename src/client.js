@@ -11,9 +11,9 @@ import en from 'react-intl/locale-data/en';
 import cs from 'react-intl/locale-data/cs';
 /* @intl-code-template-end */
 import App from './components/App';
-import createFetch from './createFetch';
+import createFetch from './core/createFetch';
 import configureStore from './store/configureStore';
-import { updateMeta } from './DOMUtils';
+import { updateMeta } from './core/DOMUtils';
 import history from './history';
 import router from './router';
 import { getIntl } from './actions/intl';
@@ -98,60 +98,56 @@ async function onLocationChange(location, action) {
     }
 
     const renderReactApp = isInitialRender ? ReactDOM.hydrate : ReactDOM.render;
-    appInstance = renderReactApp(
-      <App context={context}>{route.component}</App>,
-      container,
-      () => {
-        if (isInitialRender) {
-          // Switch off the native scroll restoration behavior and handle it manually
-          // https://developers.google.com/web/updates/2015/09/history-api-scroll-restoration
-          if (window.history && 'scrollRestoration' in window.history) {
-            window.history.scrollRestoration = 'manual';
-          }
-
-          const elem = document.getElementById('css');
-          if (elem) elem.parentNode.removeChild(elem);
-          return;
+    appInstance = renderReactApp(<App context={context}>{route.component}</App>, container, () => {
+      if (isInitialRender) {
+        // Switch off the native scroll restoration behavior and handle it manually
+        // https://developers.google.com/web/updates/2015/09/history-api-scroll-restoration
+        if (window.history && 'scrollRestoration' in window.history) {
+          window.history.scrollRestoration = 'manual';
         }
 
-        document.title = route.title;
+        const elem = document.getElementById('css');
+        if (elem) elem.parentNode.removeChild(elem);
+        return;
+      }
 
-        updateMeta('description', route.description);
-        // Update necessary tags in <head> at runtime here, ie:
-        // updateMeta('keywords', route.keywords);
-        // updateCustomMeta('og:url', route.canonicalUrl);
-        // updateCustomMeta('og:image', route.imageUrl);
-        // updateLink('canonical', route.canonicalUrl);
-        // etc.
+      document.title = route.title;
 
-        let scrollX = 0;
-        let scrollY = 0;
-        const pos = scrollPositionsHistory[location.key];
-        if (pos) {
-          scrollX = pos.scrollX;
-          scrollY = pos.scrollY;
-        } else {
-          const targetHash = location.hash.substr(1);
-          if (targetHash) {
-            const target = document.getElementById(targetHash);
-            if (target) {
-              scrollY = window.pageYOffset + target.getBoundingClientRect().top;
-            }
+      updateMeta('description', route.description);
+      // Update necessary tags in <head> at runtime here, ie:
+      // updateMeta('keywords', route.keywords);
+      // updateCustomMeta('og:url', route.canonicalUrl);
+      // updateCustomMeta('og:image', route.imageUrl);
+      // updateLink('canonical', route.canonicalUrl);
+      // etc.
+
+      let scrollX = 0;
+      let scrollY = 0;
+      const pos = scrollPositionsHistory[location.key];
+      if (pos) {
+        scrollX = pos.scrollX;
+        scrollY = pos.scrollY;
+      } else {
+        const targetHash = location.hash.substr(1);
+        if (targetHash) {
+          const target = document.getElementById(targetHash);
+          if (target) {
+            scrollY = window.pageYOffset + target.getBoundingClientRect().top;
           }
         }
+      }
 
-        // Restore the scroll position if it was saved into the state
-        // or scroll to the given #hash anchor
-        // or scroll to top of the page
-        window.scrollTo(scrollX, scrollY);
+      // Restore the scroll position if it was saved into the state
+      // or scroll to the given #hash anchor
+      // or scroll to top of the page
+      window.scrollTo(scrollX, scrollY);
 
-        // Google Analytics tracking. Don't send 'pageview' event after
-        // the initial rendering, as it was already sent
-        if (window.ga) {
-          window.ga('send', 'pageview', createPath(location));
-        }
-      },
-    );
+      // Google Analytics tracking. Don't send 'pageview' event after
+      // the initial rendering, as it was already sent
+      if (window.ga) {
+        window.ga('send', 'pageview', createPath(location));
+      }
+    });
   } catch (error) {
     if (__DEV__) {
       throw error;
