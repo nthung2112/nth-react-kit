@@ -14,13 +14,15 @@ import App from './components/App';
 import createFetch from './core/createFetch';
 import configureStore from './store/configureStore';
 import { updateMeta } from './core/DOMUtils';
+import router from './core/router';
 import history from './history';
-import router from './router';
 import { getIntl } from './actions/intl';
 
 /* @intl-code-template addLocaleData(${lang}); */
 addLocaleData([...en, ...cs]);
 /* @intl-code-template-end */
+
+const readyStates = new Set(['complete', 'loaded', 'interactive']);
 
 // Universal HTTP client
 const fetch = createFetch(window.fetch, {
@@ -178,9 +180,45 @@ export default function main() {
 // globally accesible entry point
 window.RSK_ENTRY = main;
 
+function runMainClient() {
+  // Run the application when both DOM is ready and page content is loaded
+  if (readyStates.has(document.readyState) && document.body) {
+    main();
+  } else {
+    document.addEventListener('DOMContentLoaded', main, false);
+  }
+}
+
+if (!global.Intl) {
+  // You can show loading banner here
+  require.ensure(
+    [
+      // Add all large polyfills here
+      'intl',
+      /* @intl-code-template 'intl/locale-data/jsonp/${lang}.js', */
+      'intl/locale-data/jsonp/en.js',
+      'intl/locale-data/jsonp/cs.js',
+      /* @intl-code-template-end */
+    ],
+    require => {
+      // and require them here
+      require('intl');
+      // TODO: This is bad. You should only require one language dynamically
+      /* @intl-code-template require('intl/locale-data/jsonp/${lang}.js'); */
+      require('intl/locale-data/jsonp/en.js');
+      require('intl/locale-data/jsonp/cs.js');
+      /* @intl-code-template-end */
+      runMainClient();
+    },
+    'polyfills',
+  );
+} else {
+  runMainClient();
+}
+
 // Enable Hot Module Replacement (HMR)
 if (module.hot) {
-  module.hot.accept('./router', () => {
+  module.hot.accept('./core/router', () => {
     if (appInstance && appInstance.updater.isMounted(appInstance)) {
       // Force-update the whole tree, including components that refuse to update
       deepForceUpdate(appInstance);

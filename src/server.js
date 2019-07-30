@@ -17,7 +17,7 @@ import Html from './components/Html';
 import { ErrorPageWithoutStyle } from './routes/error/ErrorPage';
 import errorPageStyle from './routes/error/ErrorPage.css';
 import createFetch from './core/createFetch';
-import router from './router';
+import router from './core/router';
 // import assets from './asset-manifest.json'; // eslint-disable-line import/no-unresolved
 import chunks from './chunk-manifest.json'; // eslint-disable-line import/no-unresolved
 import configureStore from './store/configureStore';
@@ -125,7 +125,8 @@ app.get('*', async (req, res, next) => {
     // https://github.com/kriasoft/isomorphic-style-loader
     const insertCss = (...styles) => {
       // eslint-disable-next-line no-underscore-dangle
-      styles.forEach(style => css.add(style._getCss()));
+      const removeCss = styles.forEach(style => css.add(style._getCss()));
+      return () => removeCss.forEach(dispose => dispose());
     };
 
     // Universal HTTP client
@@ -265,7 +266,7 @@ if (!module.hot) {
 // -----------------------------------------------------------------------------
 if (module.hot) {
   app.hot = module.hot;
-  module.hot.accept('./router');
+  module.hot.accept('./core/router');
 }
 
 export default app;

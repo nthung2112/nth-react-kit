@@ -5,6 +5,7 @@ import WebpackAssetsManifest from 'webpack-assets-manifest';
 import nodeExternals from 'webpack-node-externals';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import TerserPlugin from 'terser-webpack-plugin';
+import ImageminPlugin from 'imagemin-webpack-plugin';
 import overrideRules from './lib/overrideRules';
 import pkg from '../package.json';
 
@@ -291,7 +292,7 @@ const clientConfig = {
   target: 'web',
 
   entry: {
-    client: ['@babel/polyfill', './src/clientLoader.js'],
+    client: ['@babel/polyfill', './src/client.js'],
   },
 
   plugins: [
@@ -340,6 +341,12 @@ const clientConfig = {
           if (!isDebug) process.exit(1);
         }
       },
+    }),
+
+    // Check "https://github.com/Klathmon/imagemin-webpack-plugin" for more configurations
+    new ImageminPlugin({
+      disable: isDebug,
+      pngquant: { optimizationLevel: 7 },
     }),
 
     ...(isDebug
