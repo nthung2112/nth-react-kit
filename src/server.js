@@ -21,7 +21,6 @@ import router from './core/router';
 // import assets from './asset-manifest.json'; // eslint-disable-line import/no-unresolved
 import chunks from './chunk-manifest.json'; // eslint-disable-line import/no-unresolved
 import configureStore from './store/configureStore';
-import { setRuntimeVariable } from './actions/runtime';
 import { setLocale } from './actions/intl';
 import config from './config';
 
@@ -137,6 +136,10 @@ app.get('*', async (req, res, next) => {
 
     const initialState = {
       user: req.user || null,
+      runtime: {
+        initialNow: Date.now(),
+        availableLocales: config.locales,
+      },
     };
 
     const store = configureStore(initialState, {
@@ -145,20 +148,6 @@ app.get('*', async (req, res, next) => {
       // I should not use `history` on server.. but how I do redirection? follow universal-router
       history: null,
     });
-
-    store.dispatch(
-      setRuntimeVariable({
-        name: 'initialNow',
-        value: Date.now(),
-      }),
-    );
-
-    store.dispatch(
-      setRuntimeVariable({
-        name: 'availableLocales',
-        value: config.locales,
-      }),
-    );
 
     const locale = req.language;
     const intl = await store.dispatch(
