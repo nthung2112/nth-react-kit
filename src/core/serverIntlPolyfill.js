@@ -11,6 +11,7 @@ if (global.Intl) {
 
     Intl.NumberFormat = IntlPolyfill.NumberFormat;
     Intl.DateTimeFormat = IntlPolyfill.DateTimeFormat;
+    Intl.PluralRules = IntlPolyfill.PluralRules;
   }
 } else {
   // No `Intl`, so use and load the polyfill.

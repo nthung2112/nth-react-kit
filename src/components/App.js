@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { IntlProvider } from 'react-intl';
+import { RawIntlProvider } from 'react-intl';
 import { Provider as ReduxProvider } from 'react-redux';
 import StyleContext from 'isomorphic-style-loader/StyleContext';
 import AppContext from './AppContext';
@@ -16,7 +16,7 @@ const ContextType = {
   query: PropTypes.object,
   store: PropTypes.object.isRequired,
   // ReactIntl
-  intl: IntlProvider.childContextTypes.intl,
+  intl: PropTypes.any,
   locale: PropTypes.string,
 };
 
@@ -33,11 +33,11 @@ class App extends Component {
     return (
       <AppContext.Provider value={{ context }}>
         <ReduxProvider store={store}>
-          <IntlProvider {...intl}>
+          <RawIntlProvider value={intl}>
             <StyleContext.Provider value={{ insertCss }}>
               {React.Children.only(this.props.children)}
             </StyleContext.Provider>
-          </IntlProvider>
+          </RawIntlProvider>
         </ReduxProvider>
       </AppContext.Provider>
     );

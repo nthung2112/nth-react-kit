@@ -85,6 +85,9 @@ module.exports = {
     'react/prefer-stateless-function': 'off',
     'react/destructuring-assignment': 'off',
 
+    'react/static-property-placement': 'off',
+    'react/jsx-props-no-spreading': 'off',
+
     // ESLint plugin for prettier formatting
     // https://github.com/prettier/eslint-plugin-prettier
     'prettier/prettier': 'error',

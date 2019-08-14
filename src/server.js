@@ -9,7 +9,7 @@ import nodeFetch from 'node-fetch';
 import React from 'react';
 import ReactDOM from 'react-dom/server';
 import PrettyError from 'pretty-error';
-import { IntlProvider } from 'react-intl';
+import { createIntl, createIntlCache, IntlProvider } from 'react-intl';
 
 import './core/serverIntlPolyfill';
 import App from './components/App';
@@ -21,7 +21,6 @@ import router from './core/router';
 // import assets from './asset-manifest.json'; // eslint-disable-line import/no-unresolved
 import chunks from './chunk-manifest.json'; // eslint-disable-line import/no-unresolved
 import configureStore from './store/configureStore';
-import { setLocale } from './actions/intl';
 import config from './config';
 
 process.on('unhandledRejection', (reason, p) => {
@@ -90,11 +89,9 @@ app.use((err, req, res, next) => {
 });
 
 const messageCache = new Map();
-app.get('/api/intl/:locale', (req, res) => {
-  const {
-    params: { locale },
-  } = req;
+const intlCache = createIntlCache();
 
+function getMessage(locale) {
   if (!messageCache.has(locale)) {
     /* eslint-disable import/no-dynamic-require, global-require */
     try {
@@ -104,12 +101,17 @@ app.get('/api/intl/:locale', (req, res) => {
         return msgs;
       }, {});
       messageCache.set(locale, messages);
-      return res.json(messages);
+      return messages;
     } catch (e) {
-      return res.status(404).send({ error: `Locale '${locale}' not avaible` });
+      return {};
     }
   }
   const messages = messageCache.get(locale);
+  return messages;
+}
+
+app.get('/api/intl/:locale', (req, res) => {
+  const messages = getMessage(req.params.locale);
   return res.json(messages);
 });
 
@@ -134,12 +136,21 @@ app.get('*', async (req, res, next) => {
       cookie: req.headers.cookie,
     });
 
+    const locale = req.language;
+    const defaultIntl = {
+      locale,
+      cache: {},
+      defaultLocale: 'en-US',
+      messages: getMessage(locale),
+    };
+
     const initialState = {
       user: req.user || null,
       runtime: {
         initialNow: Date.now(),
         availableLocales: config.locales,
       },
+      intl: defaultIntl,
     };
 
     const store = configureStore(initialState, {
@@ -148,13 +159,6 @@ app.get('*', async (req, res, next) => {
       // I should not use `history` on server.. but how I do redirection? follow universal-router
       history: null,
     });
-
-    const locale = req.language;
-    const intl = await store.dispatch(
-      setLocale({
-        locale,
-      }),
-    );
 
     const context = {
       insertCss,
@@ -165,7 +169,7 @@ app.get('*', async (req, res, next) => {
       // You can access redux through react-redux connect
       store,
       // intl instance as it can be get with injectIntl
-      intl,
+      intl: createIntl(defaultIntl, intlCache),
       locale,
     };
 

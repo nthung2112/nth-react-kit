@@ -4,23 +4,14 @@ import ReactDOM from 'react-dom';
 import deepForceUpdate from 'react-deep-force-update';
 import queryString from 'query-string';
 import { createPath } from 'history';
-import { addLocaleData } from 'react-intl';
-// This is so bad: requiring all locale if they are not needed?
-/* @intl-code-template import ${lang} from 'react-intl/locale-data/${lang}'; */
-import en from 'react-intl/locale-data/en';
-import cs from 'react-intl/locale-data/cs';
-/* @intl-code-template-end */
+import { createIntl, createIntlCache } from 'react-intl';
+
 import App from './components/App';
 import createFetch from './core/createFetch';
 import configureStore from './store/configureStore';
 import { updateMeta } from './core/DOMUtils';
 import router from './core/router';
-import history from './history';
-import { getIntl } from './actions/intl';
-
-/* @intl-code-template addLocaleData(${lang}); */
-addLocaleData([...en, ...cs]);
-/* @intl-code-template-end */
+import history from './core/history';
 
 const readyStates = new Set(['complete', 'loaded', 'interactive']);
 
@@ -35,6 +26,9 @@ const store = configureStore(window.App.state, {
   fetch,
   history,
 });
+
+const cache = createIntlCache();
+const intl = createIntl(store.getState().intl, cache);
 
 // Allow the passed state to be garbage-collected
 // https://redux.js.org/recipes/serverrendering
@@ -54,7 +48,7 @@ const context = {
   // Universal HTTP client
   fetch,
   // intl instance as it can be get with injectIntl
-  intl: store.dispatch(getIntl()),
+  intl,
 };
 
 const container = document.getElementById('app');
@@ -76,7 +70,7 @@ async function onLocationChange(location, action) {
   }
   currentLocation = location;
 
-  context.intl = store.dispatch(getIntl());
+  context.intl = createIntl(store.getState().intl, cache);
 
   const isInitialRender = !action;
   try {
