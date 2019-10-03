@@ -48,7 +48,7 @@ const routes = {
 
     // Provide default values for title, description etc.
     route.title = `${route.title || 'Untitled Page'} - NTH React Kit`;
-    route.description = route.description || '';
+    route.description = route.description || 'Description for NTH React Kit';
 
     return route;
   },

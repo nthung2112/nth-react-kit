@@ -1,10 +1,16 @@
 {
+  "short_name": "NTH Starter Kit",
+  "name": "NTH Starter Kit",
+  "description": "NTH Starter Kit Web Application",
   "icons": [
     {
       "src": "icon.png",
-      "sizes": "192x192",
+      "sizes": "256x256",
       "type": "image/png"
     }
   ],
-  "start_url": "/"
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#fff",
+  "background_color": "#fff"
 }

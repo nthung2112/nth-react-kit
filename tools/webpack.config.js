@@ -373,6 +373,7 @@ const clientConfig = {
       ? [
           // replace UglifyJS
           new TerserPlugin({
+            sourceMap: false,
             terserOptions: {
               ecma: 6,
               warnings: false,
